@@ -4,7 +4,7 @@
 
 `mvn package`
 
-then find the runnable tools in `target/jstor-feature-extractor/`
+then find the runnable tool in `target/jstor-feature-extractor/`
 
 ## Run
 
@@ -20,7 +20,7 @@ Usage: jstor-feature-extractor [options]
       to stdout)
 ```
 
-To add custom Java options (for adjusting memory, etc.) use:
+To add custom Java options (for adjusting memory, etc.) use:  
 `JAVA_OPTS="-Xmx4g" /path/to/jstor-feature-extractor <arguments>`
 
 ## Input
