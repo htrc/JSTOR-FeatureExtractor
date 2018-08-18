@@ -40,7 +40,7 @@ public class Main {
                      StandardCharsets.UTF_8
                  ))) {
             Stream<Indexed<String>> indexedJsons = StreamUtils.zipWithIndex(lineReader.lines());
-            Stream<Indexed<String>> nonEmptyJsonLines = indexedJsons.filter(line -> !line.getValue().isEmpty());
+            Stream<Indexed<String>> nonEmptyJsonLines = indexedJsons.filter(line -> !line.getValue().trim().isEmpty());
             Stream<InputDocument> goodDocuments = nonEmptyJsonLines.map(Main::parseJsonInput)
                                                                    .filter(Objects::nonNull);
             Stream<Document> documentFeatures = goodDocuments.map(Main::getDocumentFeatures);
