@@ -3,6 +3,8 @@ package tdm.tools.featureextractor.jstor;
 import com.beust.jcommander.JCommander;
 import com.codepoetics.protonpack.Indexed;
 import com.codepoetics.protonpack.StreamUtils;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,7 +23,13 @@ import tdm.featureextractor.java.features.PageFeatures;
 public class Main {
     private static final String appName = System.getProperty("app.name", "jstor-feature-extractor");
     private static final StructureParserConfig parserConfig = PageStructureParser.defaultConfig();
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper;
+
+    static {
+        JsonFactory jsonFactory = new JsonFactory();
+        jsonFactory.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
+        mapper = new ObjectMapper(jsonFactory);
+    }
 
     public static void main(String[] args) throws Exception {
         Conf conf = new Conf();
@@ -34,11 +42,14 @@ public class Main {
             System.exit(1);
         }
 
-        try (BufferedReader lineReader =
+        try (
+            BufferedReader lineReader =
                  new BufferedReader(new InputStreamReader(
                      conf.getInputJsonLinesStream(),
                      StandardCharsets.UTF_8
-                 ))) {
+                 ));
+            PrintStream outputStream = conf.getOutputJsonLinesStream()
+        ) {
             Stream<Indexed<String>> indexedJsons = StreamUtils.zipWithIndex(lineReader.lines());
             Stream<Indexed<String>> nonEmptyJsonLines = indexedJsons.filter(line -> !line.getValue().trim().isEmpty());
             Stream<InputDocument> goodDocuments = nonEmptyJsonLines.map(Main::parseJsonInput)
@@ -46,13 +57,14 @@ public class Main {
             Stream<Document> documentFeatures = goodDocuments.map(Main::getDocumentFeatures);
 
             // output the extracted features as JSON
-            documentFeatures.forEach(docFeatures -> writeFeaturesAsJson(docFeatures, conf.getOutputJsonLinesStream()));
+            documentFeatures.forEach(docFeatures -> writeFeaturesAsJson(docFeatures, outputStream));
         }
     }
 
     private static void writeFeaturesAsJson(Document features, PrintStream outputStream) {
         try {
             mapper.writeValue(outputStream, features);
+            outputStream.println();
         }
         catch (IOException e) {
             throw new RuntimeException(e);
