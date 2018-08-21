@@ -16,7 +16,7 @@ Usage: jstor-feature-extractor [options]
     -i, --input
       Input JSONL (jsonlines.org) data to process (omit to read from stdin)
     -o, --output
-      Output JSON document containing the extracted features (omit to output 
+      Output JSONL document containing the extracted features (omit to output 
       to stdout)
 ```
 
