@@ -49,6 +49,8 @@ The output JSON has a structure similar to the following:
 ```json
 {
   "id": "the document id",
+  "schemaVersion": "4.0",
+  "dateCreated": "2018-08-21T08:56",
   "features": {
     "pageCount" : 344,
     "pages" : [
